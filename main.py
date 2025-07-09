@@ -47,7 +47,7 @@ def get_ticket():
     account_cookie = input("請輸入帳號 cookie(SID): ")
 
     if get_kind == '1':
-        sell_time = input("tixcraft 搶票時間(格式: HH:MM:SS): ")
+        sell_time = input("tixcraft 搶票時間(24小時制)(格式: HH:MM:SS): ")
         sell_hour, sell_minute, sell_second = map(int, sell_time.split(':'))
 
     #後續參數設置
