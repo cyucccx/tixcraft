@@ -48,6 +48,8 @@ ex. 19796
 
 我們要複製SID的值
 
+### 5. 執行main.py
+
 ![取得cookie](./readme/cookie.png)
 
 ## Q&A
