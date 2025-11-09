@@ -9,6 +9,35 @@ import datetime
 from selenium.webdriver.chrome.options import Options
 from captcha import ocr_captcha
 
+# 將 AUTO_CONFIG["enabled"] 改為 True 並填入下方參數即可跳過所有 input
+AUTO_CONFIG = {
+    "enabled": "True",
+    "get_kind": "2",
+    "have_seat": "2",
+    "change_activity": "25_mayday",
+    "show_id": "21366",
+    "price_keywords": ["4580"],
+    "desired_ticket_count": 4,
+    "sort_kind": "n",
+    "kick_price": [],
+    "account_cookie": "5plqomlbh481o2bk27e899ejgk",
+    "sell_time": "00:00:00",
+}
+
+def prompt_value(key, prompt_text, transform=None):
+    """
+    若 AUTO_CONFIG["enabled"] 為 True，直接回傳預設值；否則使用 input。
+    transform 只會在互動輸入時套用。
+    """
+    if AUTO_CONFIG.get("enabled"):
+        if key not in AUTO_CONFIG:
+            raise KeyError(f"缺少自動化設定: {key}")
+        value = AUTO_CONFIG[key]
+        print(f"{prompt_text}{value}")
+        return value
+    user_input = input(prompt_text)
+    return transform(user_input) if transform else user_input
+
 def wait_until_specific_time(sell_hour, sell_minute, sell_second):
     while True:
         # 获取当前时间
@@ -36,18 +65,30 @@ def get_ticket():
     sell_hour, sell_minute, sell_second = 0, 0, 0
 
     # 輸入參數
-    get_kind = input("請輸入搶票類型(1: 定時搶票, 2: 立馬搶票): ")
-    have_seat = input("請輸入座位類型(1.指定價錢座位, 2.有座位就好(每次皆先嘗試一次指定座位)): ")
-    change_activity = input("tixcraft活動名稱代號:")
-    show_id = input("tixcraft 場次ID:")
-    price_keywords = input("想要的票價關鍵字，以空格隔開(沒有請enter不要亂打，且請打正確不然會抓錯)(例如: 3225 4200 5600): ").strip().split()
-    desired_ticket_count = int(input("想要購買的張數: "))  # 新增這行
-    sort_kind = input("優先購買便宜區域?(從座位最下區域往上判斷)(預設: 是)(y/n): ")
-    kick_price =  input("請輸入要排除的價錢(身障票價等，沒有請enter不要亂打)(預設偵測到身障相關字詞將排除)(例如: 3225 4200 5600): ").strip().split()
-    account_cookie = input("請輸入帳號 cookie(SID): ")
+    get_kind = prompt_value("get_kind", "請輸入搶票類型(1: 定時搶票, 2: 立馬搶票): ")
+    have_seat = prompt_value("have_seat", "請輸入座位類型(1.指定價錢座位, 2.有座位就好(每次皆先嘗試一次指定座位)): ")
+    change_activity = prompt_value("change_activity", "tixcraft活動名稱代號:")
+    show_id = prompt_value("show_id", "tixcraft 場次ID:")
+    price_keywords = prompt_value(
+        "price_keywords",
+        "想要的票價關鍵字，以空格隔開(沒有請enter不要亂打，且請打正確不然會抓錯)(例如: 3225 4200 5600): ",
+        transform=lambda text: text.strip().split()
+    )
+    desired_ticket_count = prompt_value(
+        "desired_ticket_count",
+        "想要購買的張數: ",
+        transform=lambda text: int(text)
+    )
+    sort_kind = prompt_value("sort_kind", "優先購買便宜區域?(從座位最下區域往上判斷)(預設: 是)(y/n): ")
+    kick_price = prompt_value(
+        "kick_price",
+        "請輸入要排除的價錢(身障票價等，沒有請enter不要亂打)(預設偵測到身障相關字詞將排除)(例如: 3225 4200 5600): ",
+        transform=lambda text: text.strip().split()
+    )
+    account_cookie = prompt_value("account_cookie", "請輸入帳號 cookie(SID): ")
 
     if get_kind == '1':
-        sell_time = input("tixcraft 搶票時間(24小時制)(格式: HH:MM:SS): ")
+        sell_time = prompt_value("sell_time", "tixcraft 搶票時間(24小時制)(格式: HH:MM:SS): ")
         sell_hour, sell_minute, sell_second = map(int, sell_time.split(':'))
 
     #後續參數設置
