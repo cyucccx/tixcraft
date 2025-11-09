@@ -11,7 +11,7 @@ from captcha import ocr_captcha
 
 # 將 AUTO_CONFIG["enabled"] 改為 True 並填入下方參數即可跳過所有 input
 AUTO_CONFIG = {
-    "enabled": "True",
+    "enabled": True,
     "get_kind": "2",
     "have_seat": "2",
     "change_activity": "25_mayday",
